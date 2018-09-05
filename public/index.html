@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>
+        MyEventPlanner
+
+    </title>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+
+    <img style="background-color:rgba(0, 0, 0, 0.507);width:100%;height:100%;object-fit:cover;" src="/images/bg.png">
+
+    <div class="arrow bounce">
+        <a class="fa fa-arrow-down fa-2x" href="#content"></a>
+    </div>
+
+    <div id="app">
+        <div id="content">
+
+
+
+            <!-------- HEAD NAVIGATION BAR ---------------->
+            <nav class="navbar navbar-inverse navbar-statis-top" role="navigation">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a href="#" v-on:click="currentPage = 'home'"><img width="140px" src="/images/logo.png"></a>
+
+
+                        <button class="navbar-toggle" data-toggle="collapse" data-target="#myNavBarCollapse">
+
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse" id="myNavBarCollapse">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">NOS PARTENAIRES<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li v-on:click="currentPage = 'partners'"><a href="#">Toutes catégories confondues</a></li>
+
+                                    <li v-on:click="currentPage = 'partners'"><a href="#photographes">Photographes</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#traiteurs">Traiteurs</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#dj">DJ</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#decorateurs">Décorateurs</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#transports">Modes de transport</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#soins">Soins</a></li>
+                                    <li v-on:click="currentPage = 'partners'"><a href="#gateaux">Gâteaux</a></li>
+                                </ul>
+                            </li>
+                            <li v-on:click="currentPage = 'forum'"><a href="#">FORUM</a></li>
+                            <li v-if='user_connected' v-on:click="currentPage = 'panier'"><a href="#">MON PANIER</a></li>
+                            <li v-if='user_connected && userConnected.isAdmin' class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">ESPACE ADMIN<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li v-on:click="currentPage = 'users_management'"><a href="#">Gestion des
+                                            utilisateurs</a></li>
+                                    <li v-on:click="currentPage = 'data_management'"><a href="#">Gestion des données
+                                            services</a></li>
+                                </ul>
+                            </li>
+
+                            <li>
+                                <!-- BOUTON DE CONNEXION => le clic affiche un formulaire de connexion/inscription-->
+                                <button class="btn btn-info" style="margin-top:8px" v-on:click="buttonClicked = !buttonClicked;form_errors = [];"
+                                    v-if="!user_connected">CONNEXION</button>
+
+                                <!-- BOUTON "MON COMPTE" => apparait une fois un utilisateur connecté -->
+                                <button class="btn btn-info" style="margin-top:8px" v-else v-on:click="buttonClicked = !buttonClicked">
+                                    MON PROFIL <span class="glyphicon">&#xe008;</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+
+
+                </div>
+            </nav>
+
+            <div class="dropdown-content" v-if="!user_connected && buttonClicked">
+
+                <div class="row">
+                    <div id="panel" class="col-lg-6 col-xs-12 col-sm-6 col-md-6">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-6 text-center">
+                                    <a href="#" v-on:click="login_selected = true; form_errors = []" v-bind:class="{ active: login_selected }">
+                                        Se connecter
+                                    </a>
+                                </div>
+                                <div class="col-xs-6 text-center">
+                                    <a href="#" v-on:click="login_selected = false; form_errors = []" v-bind:class="{ active: !login_selected }">
+                                        S'inscrire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+
+                            <!-- LOGIN-->
+                            <form v-if="login_selected" method="post" v-on:submit.prevent="sign_in">
+                                <div class="alert alert-danger" role="alert" v-if="form_errors.length">
+                                    <ul>
+                                        <li v-for="error in form_errors">{{ error }}</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <input type="text" placeholder="Email" id="sign_in_email" required>
+                                    <input type="password" placeholder="Mot de passe" id="sign_in_password" required>
+                                    <input type="submit" class="btn btn-info" value="Connexion">
+
+                                </div>
+                                <div class="text-center">
+                                    <a href="https://phpoll.com/recover" class="forgot-password">Mot de
+                                        passe oublié ?</a>
+                                </div>
+                            </form>
+
+                            <!-- REGISTER -->
+                            <form id="register-form" @submit.prevent="register" v-else method="post" role="form">
+                                <div class="alert alert-danger" role="alert" style="font-size:12px;" v-if="form_errors.length">
+                                    <ul>
+                                        <li style="font-size:12px;" v-for="error in form_errors">{{ error }}</li>
+                                    </ul>
+                                </div>
+                                <input type="text" id="reg_username" placeholder="Nom d'utilisateur" required>
+
+                                <label class="container" style="width:50%;float:left">Homme
+                                    <input type="radio" checked="checked" name="radio" style="width:25%;float:left">
+                                    <span class="checkmark" style="width:25%;float:left"></span>
+                                </label>
+                                <label class="container" style="width:50%;float:left">Femme
+                                    <input type="radio" name="radio" style="width:25%;float:left">
+                                    <span class="checkmark" style="width:25%;float:left"></span>
+                                </label>
+
+                                <input type="email" id="reg_email" placeholder="Email" required>
+                                <input type="password" id="reg_password" placeholder="Mot de passe" required>
+                                <input type="password" id="reg_conf_password" placeholder="Confirmation de mot de passe"
+                                    required>
+                                <input type="submit" class="btn btn-info" value="Je m'inscris">
+
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- FENETRE DE COMPTE affichée suite au clic sur le bouton "mon compte" -->
+            <div class="dropdown-content" v-if="user_connected && buttonClicked">
+
+                <div id="panel" class="panel">
+                    <p> {{ userConnected.username}}</p>
+
+                    <p class=" clickable-text" v-on:click="currentPage = 'mon-compte'"> Modifier mes
+                        informations personnelles</p>
+                    <p class="clickable-text">Déconnexion</p>
+
+
+
+                </div>
+
+            </div>
+
+
+            <!------------------------ PAGES -------------------------->
+            <div class="pages">
+
+
+                <!-- HOME -->
+                <section id="home" v-if="currentPage === 'home'">
+                    <div class="container">
+                        <div class="jumbotron">
+                            <center>
+                                <h1>LES FAVORIS</h1>
+                                <p>Afin de vous guider dans votre recherche des meilleurs services de fêtes, nous avons
+                                    concocté pour vous une liste comportant l'entreprise partenaire la plus appréciée
+                                    dans chaque catégorie.</p>
+                                <p style="font-size:12px"> Ce résultat est issu de la notation des services par nos
+                                    utilisateurs bien-aimés.</p>
+                            </center>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="card-columns">
+                            <mycard v-for="element in best_grades" v-bind:el="element">
+                            </mycard>
+                        </div>
+                    </div>
+
+                </section>
+
+
+
+
+
+                <!-- PARTENAIRES -->
+                <section id="partners" v-else-if="currentPage === 'partners'">
+
+
+                    <div class="container">
+                        <div class="card-columns" v-for="cat in categories">
+                            <mycard v-for="element in filter(cat)" v-bind:el="element">
+                            </mycard>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-------------------- ADMIN  ----------------->
+                <section id="data_management" v-else-if="currentPage === 'data_management'">
+
+                    <table id="data_table">
+                        <tr>
+                            <th>
+                                Catégorie
+                            </th>
+
+                            <th width="12px" v-for="attr in dataAttributes">
+                                {{ attr }}
+                            </th>
+                        </tr>
+                        <tr v-for="el in data">
+                            <td> {{ el.categorie }}</td>
+                            <td v-for="attr in dataAttributes">{{ el[attr]}}</td>
+                        </tr>
+                    </table>
+
+                </section>
+
+                <section id="users_management" v-else-if="currentPage === 'users_management'">
+
+                    <table id="users_table">
+                        <tr>
+                            <th width="12px" v-for="attr in usersAttributes">
+                                {{ attr }}
+                            </th>
+                        </tr>
+                        <tr v-for="el in users">
+                            <td v-for="attr in usersAttributes">{{ el[attr]}}</td>
+                        </tr>
+                    </table>
+                </section>
+
+
+
+
+
+                <!------------ FORUM -------------->
+                <section id="forum" v-else-if="currentPage==='forum'">
+
+
+                    <div class="container">
+                        <div class="jumbotron">
+                            <center>
+                                <h1> Oups ! </h1>
+                                <p>Malheureusement cette partie du site est actuellement en maintenance</p>
+                                <a class="btn btn-default" @click="currentPage = 'home'">Retourner à la page d'acuueil</a>
+                                <a class="btn btn-info" @click="currentPage='contact'">Se plaindre auprès des
+                                    administrateurs</a>
+                            </center>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+
+        <!-------- FOOT NAVIGATION BAR ---------------->
+        <footer class="footer">
+            <div class="navbar navbar-default">
+                <div class="container-fluid text-center">
+
+                    <strong v-on:click="currentPage = 'home'"><a href="#">ACCUEIL</a></strong>
+                    <strong v-on:click="currentPage = 'partners'"><a href="#"></a>PARTENAIRES</a></strong>
+                    <strong v-on:click="currentPage = 'forum'"><a href="#"></a>FORUM</a></strong>
+
+
+                    <p style="padding: 5px;">Copyright &#169; 2018 My Event Planner. Tous droits réservés.</p>
+
+                    <!--Facebook-->
+                    <button type="button" class="btn btn-fb dark-blue-btn"><i class="fa fa-facebook pr-1"></i></button>
+                    <!--Google +-->
+                    <button type="button" class="btn btn-gplus red-btn"><i class="fa fa-google-plus pr-1"></i></button>
+                    <!--Linkedin-->
+                    <button type="button" class="btn btn-li blue-btn"><i class="fa fa-linkedin pr-1"></i></button>
+                    <!--Email-->
+                    <button type="button" class="btn btn-email gray-btn"><a style="color:white" href="mailto:bourdoulous@et.esiea.fr"><i
+                                class="fa fa-envelope pr-1"></i></a></button>
+
+                </div>
+
+            </div>
+        </footer>
+
+
+
+
+
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
+    <script>
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+
+
+        Vue.component('mycard', {
+            props: ['el'],
+            template: `
+            <div class="card" >
+                        <div class="card-body" style="font-size:12px;display:block;">
+                            <img class="card-img-top" style="width:360px;height:360px;object-fit:cover;" v-bind:src=el.img alt="img">
+                            <div style="padding:5px;"><b class="card-title">{{ el.categorie }} : {{ el.nom }}</b>
+                            <p class="card-text">{{ el.text }} </p>
+                            <p class="card-price"> {{ el.prix }} €</p>
+                            <p class="card-grade"> {{ el.note }} /5</p>
+                            <button class="btn btn-info"><a :href=el.source target="_blank">Visiter leur site</a></button>
+                            <button class="btn btn-danger" value="+"></button></div>
+
+                        </div>
+                    </div>
+                    `
+        })
+
+        Vue.prototype.$http = axios
+
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+
+                login_selected: true,
+                services_selected: true,
+                header_1_selected: true,
+                buttonClicked: false,
+                user_connected: true,
+
+                userConnected: {
+                    isAdmin: true,
+                    email: '',
+                    username: ''
+                },
+                form_errors: [],
+
+                currentPage: 'home',
+                users: [],
+                data: [],
+                best_grades: [],
+                dataAttributes: [],
+                usersAttributes: [],
+                categories: []
+
+            },
+            created() {
+
+                this.init_tabs_columns()
+                if (this.user_connected && this.userConnected.isAdmin) {
+                    this.get_data()
+                    this.get_users()
+                }
+                this.$http.get('/best_grade.html')
+                    .then(res => {
+                        console.log(res.data)
+                        this.best_grades = res.data
+
+                    })
+
+
+            },
+            methods: {
+                register: function () {
+                    this.form_errors = []
+                    var email = document.getElementById("reg_email").value
+                    var username = document.getElementById("reg_username").value
+                    var password = document.getElementById("reg_password").value
+                    var conf_password = document.getElementById("reg_conf_password").value
+
+
+                    if (password != conf_password) {
+                        console.log('mots de passe différents')
+                        this.form_errors.push('La confirmation du mot de passe est incorrect')
+
+                    } else {
+                        this.$http.post('/register.html', {
+                                username: username,
+                                email: email,
+                                password: password
+                            })
+                            .then(res => {
+                                console.log(res.data)
+                                if (res.data === 'email') {
+                                    console.log('mail existant')
+                                    this.form_errors.push('Cette adresse mail est déjà utilisée')
+                                } else {
+                                    this.userConnected.isAdmin = false
+                                    this.userConnected.email = email
+                                    this.userConnected.username = username
+
+                                    this.user_connected = true
+
+                                    this.buttonClicked = false
+                                    console.log('new user ' + this.userConnected.email)
+
+                                }
+
+                            })
+                            .catch(err => {
+                                console.log('error', err)
+
+                            })
+                    }
+
+
+
+
+                },
+                sign_in: function () {
+                    this.form_errors = []
+                    var email = document.getElementById("sign_in_email").value
+                    var password = document.getElementById("sign_in_password").value
+
+
+                    this.$http.post('/connect.html', {
+                            email: email,
+                            password: password
+                        })
+                        .then(res => {
+                            switch (res.data) {
+                                case 'email_error':
+                                    console.log('Cette adresse mail n\'existe pas')
+                                    this.form_errors.push('Cette adresse mail est introuvable')
+                                    break
+                                case 'password_error':
+                                    console.log('Mauvais mot de passe')
+                                    this.form_errors.push('Le mot de passe entré est incorrect')
+                                    break
+                                default:
+                                    console.log(res.data + ' OK : ' + email + " is connected")
+                                    this.userConnected.email = email
+                                    this.userConnected.username = res.data.username
+                                    this.userConnected.isAdmin = res.data.isAdmin
+                                    this.user_connected = true
+                                    this.buttonClicked = false
+
+
+                                    if (this.userConnected.isAdmin) {
+                                        this.get_data()
+                                    }
+
+
+
+
+                            }
+                        })
+
+
+                        .catch(err => {
+                            console.log("error", err)
+                        })
+                },
+                get_data() {
+                    this.$http.get('/get_data.html')
+                        .then(res => {
+                            console.log(res.data)
+                            this.data = res.data
+
+                        })
+
+
+                },
+                get_users() {
+                    this.$http.post('/users.html')
+                        .then(res => {
+                            console.log(res.data)
+                            this.users = res.data
+
+                        })
+
+                },
+                filter(cat) {
+                    var deb = 0;
+                    var fin = 0;
+                    var temp = []
+                    console.log(data, cat)
+                    while (this.data[deb].categorie != cat) {
+                        deb++;
+                    }
+                    fin = deb;
+                    while (fin < this.data.length && this.data[fin].categorie === cat) {
+                        fin++;
+                    }
+
+                    for (let i = deb; i < fin; i++) {
+                        temp.push(this.data[i])
+                    }
+
+                    return temp;
+
+
+                },
+                init_tabs_columns() {
+                    this.$http.get('/get_attr.html')
+                        .then(res => {
+                            console.log(res.data)
+
+                            this.dataAttributes = res.data.dataAttributes
+                            this.usersAttributes = res.data.usersAttributes
+                            this.categories = res.data.categories
+
+                        })
+
+
+
+
+                }
+
+
+
+            }
+
+        });
+    </script>
+
+
+
+</body>
+
+</html>
