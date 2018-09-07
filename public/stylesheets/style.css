@@ -103,7 +103,7 @@ img:hover {
   }
 }
 
-#mycard {
+.card {
   background-color: white;
   border-radius: 2px;
   box-shadow: 0px 3px 4px 0px lightgray;
@@ -113,6 +113,7 @@ img:hover {
   display: inline-block;
   width: 100%;
 }
+
 
 .panel-body input {
   width: 100%;
@@ -208,21 +209,68 @@ img:hover {
 
 /******* TABLEAUX ********/
 
-#data_table, #users_table {
-  margin-top: 20px;
-  width: 100%;
-  background: white;
-}
 
-#data_table, td, th {
-  text-align: left;
-  padding: 2px;
-  border: 1px solid rgb(114, 114, 114);
+table {
+  margin:auto;
+  border-collapse: collapse;
+  overflow-x:auto;
+  display:block;
+  border: 2px solid #00134d;
+  border-radius: 3px;
+  background-color: #fff;
+  width:fit-content;
+  max-width:100%;
 }
 
 th {
-  background-color: rgb(134, 134, 134);
-  color: white;
+  background-color: #002080;
+  color: rgba(255,255,255,0.66);
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+td {
+  background-color: #f9f9f9;
+  min-width:400px;
+  border:1px solid lightgray;
+  text-align: center;
+}
+
+th, td {
+  width: 100%;
+  padding: 10px 20px;
+}
+
+th.active {
+  color: #fff;
+}
+
+th.active .arrow {
+  opacity: 1;
+}
+
+.arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  opacity: 0.66;
+}
+
+.arrow.asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #fff;
 }
 
 .panel-heading a {
@@ -289,5 +337,14 @@ th {
 
 .clickable-text:hover{
   color: deepskyblue;
+}
+
+tr:hover td{
+  background-color: #c2c2c2;
+}
+
+tr.activate{
+  background-color: #c2c2c2;
+  border:1px solid #808080;
 }
 

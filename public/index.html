@@ -139,7 +139,7 @@
                                     <input type="radio" name="gender">Femme<br>
 
                                     <input type="email" id="reg_email" placeholder="Email" required>
-                                    <input type="password" id="reg_password" placeholder="Mot de passe" required>
+                                    <input type="password" id="reg_password" placeholder="Mot de passe" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" title="Doit contenir au moins un chiffre et une lettre majuscule et minuscule et au moins 6 caractères.">
                                     <input type="password" id="reg_conf_password" placeholder="Confirmation de mot de passe"
                                         required>
                                     <input type="submit" class="btn btn-info" value="Je m'inscris">
@@ -253,10 +253,14 @@
 
                         <panier :panier="panier"></panier>
 
-                        <button style="margin:0 auto" class="btn btn-success" @click="save_panier()">Enregistrer les
+                        <button style="margin-left:40%;margin-top:40px;" class="btn btn-success" @click="save_panier()">Enregistrer
+                            les
                             modification</button>
-                        <p>Si vous n'enregistrez pas ces modifications votre panier sera vide la prochaine fois que
+                        <p style="font-size:12px">*Si vous n'enregistrez pas ces modifications votre panier sera vide
+                            la prochaine fois que
                             vous vous connecterez!</p>
+
+                        <button class="btn btn-danger" style="margin-top:40px;">Finaliser ma commande</button>
 
 
                 </section>
@@ -265,35 +269,40 @@
                 <!-------------------- ADMIN  ----------------->
                 <section id="data_management" v-else-if="currentPage === 'data_management'">
 
+                    <div style="width:100%;text-align: right">
+                        <button class="update_button btn btn-success" @click="update('data')" style="margin:5px;">UPDATE</button>
+                    </div>
+                    <form>
+                        Search <input name="query" v-model="searchQuery" style="width:100%;border-radius:3px;margin-bottom:10px;">
+                    </form>
+                    <table-component :data="data" :columns="dataAttributes" :filter-key="searchQuery">
+                    </table-component>
+                    ///////////////////
 
-                    <button class="update_button" @click="update('data')">UPDATE</button>
-                    <table id="data_table">
-                        <tr>
-                            <th width="12px" v-for="attr in dataAttributes">
-                                {{ attr }}
-                            </th>
-                        </tr>
-                        <tr v-for="el in data">
-                            <td v-for="attr in dataAttributes">{{ el[attr]}}</td>
-                        </tr>
-                    </table>
+                    <button class="btn btn-danger" v-if="el_selected != null" @click="delete(el_selected)">Supprimer un
+                        élément</button>
+
 
                 </section>
 
                 <section id="users_management" v-else-if="currentPage === 'users_management'">
 
-                    <button class="update_button" @click="update('users')">UPDATE</button>
+                    <div style="width:100%;text-align: right">
+                        <button class="update_button btn btn-success" @click="update('users')" style="margin:5px;">UPDATE</button>
 
-                    <table id="users_table">
-                        <tr>
-                            <th v-for="attr in usersAttributes">
-                                {{ attr }}
-                            </th>
-                        </tr>
-                        <tr v-for="el in users">
-                            <td v-for="attr in usersAttributes">{{ el[attr]}}</td>
-                        </tr>
-                    </table>
+                    </div>
+
+                    <form>
+                        <p>Search</p> <input name="query" v-model="searchQuery" style="width:100%;border-radius:3px;margin-bottom:10px;">
+                    </form>
+                    <div class="card">
+                        <table-component :data="users" :columns="usersAttributes" :filter-key="searchQuery">
+                        </table-component>
+
+                    </div>
+
+
+
                 </section>
 
 
@@ -347,7 +356,7 @@
                         <div v-if="!hidden_section_pwd">
 
                             <input type="password" id="info_password" placeholder="Mot de passe actuel" required>
-                            <input type="password" id="info_new_password" placeholder="Nouveau mot de passe" required>
+                            <input type="password" id="info_new_password" placeholder="Nouveau mot de passe" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" title="Doit contenir au moins un chiffre et une lettre majuscule et minuscule et au moins 8 caractères.">
                             <input type="password" id="info_conf_password" placeholder="Confirmation du nouveau mot de passe"
                                 required>
 
@@ -420,11 +429,11 @@
         </div>
 
         <div style="position: fixed;top:70px;width:100%" class="alert alert-success" v-show="user_connected && success_update">
-                <p>
-                    Mise à jour réalisée avec succès.
-                </p>
-                <i @click="success_update = false" style="position: absolute;right:5px;top:5px;cursor: pointer;">x</i>
-            </div>
+            <p>
+                Mise à jour réalisée avec succès.
+            </p>
+            <i @click="success_update = false" style="position: absolute;right:5px;top:5px;cursor: pointer;">x</i>
+        </div>
 
 
 
@@ -479,7 +488,7 @@
         var app = new Vue({
             el: '#app',
             data: {
-
+                el_selected : null,
                 success_update: false,
                 hidden_section_pwd : true,
                 login_selected: true,
@@ -506,7 +515,8 @@
                 usersAttributes: [],
                 categories: [],
                 panier: [],
-                service_error: false
+                service_error: false,
+                searchQuery: ''
 
             },
             created() {
@@ -522,17 +532,20 @@
                     this.get_users()
 
                 }
-                console.log('get best_grades')
+                this.get_best_grades()
+
+
+            },
+            methods: {
+                get_best_grades(){
+                    console.log('get best_grades')
                 this.$http.get('/best_grade.html')
                     .then(res => {
                         console.log('Best_grades : ',res.data)
                         this.best_grades = res.data
 
                     })
-
-
-            },
-            methods: {
+                },
                 register: function () {
                     this.form_errors = []
                     var email = document.getElementById("reg_email").value
@@ -638,6 +651,8 @@
 
                 },
                 filter(cat) {
+                    console.log(cat)
+                    console.log(this.data[0].categorie)
 
                     var deb = 0;
                     var fin = 0;
@@ -653,7 +668,6 @@
                     for (let i = deb; i < fin; i++) {
                         temp.push(this.data[i])
                     }
-                    console.log(temp)
 
                     return temp;
 
@@ -662,12 +676,9 @@
                 init_tabs_columns() {
                     this.$http.get('/get_attr.html')
                         .then(res => {
-
-
                             this.dataAttributes = res.data.dataAttributes
                             this.usersAttributes = res.data.usersAttributes
                             this.categories = res.data.categories
-                            this.categories.push('categorie')
 
                         })
 
@@ -690,7 +701,7 @@
 
                 },
                 deleteUser(user) {
-                    this.$http.post('/delete.html',
+                    this.$http.post('/delete_user.html',
                         user)
                 },
                 disconnect() {
@@ -818,11 +829,28 @@
                             })
 
                         
+                },
+                deleteData(name){
+                    console.log(name)
+                    this.$http.post('/delete_data.html',{
+                        name:name}).then(
+                        res => {
+                            this.update('data')
+                            console.log(this.data)
+                            this.init_tabs_columns()
+                            this.get_best_grades()
+
+                            
+
+                        
+                    })
+                        
+                    }
                 }
 
 
 
-            }
+            
 
         });
 
@@ -865,6 +893,66 @@
                         </div>`
         })
 
+        Vue.component('table-component', {
+  template: '#table-template',
+  props: {
+    data: Array,
+    columns: Array,
+    filterKey: String
+  },
+  data: function () {
+    var sortOrders = {}
+    this.columns.forEach(function (key) {
+      sortOrders[key] = 1
+    })
+    return {
+      sortKey: '',
+      sortOrders: sortOrders
+    }
+  },
+  computed: {
+    filteredData: function () {
+      var sortKey = this.sortKey
+      var filterKey = this.filterKey && this.filterKey.toLowerCase()
+      var order = this.sortOrders[sortKey] || 1
+      var data = this.data
+      if (filterKey) {
+        data = data.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
+        })
+      }
+      if (sortKey) {
+        data = data.slice().sort(function (a, b) {
+          a = a[sortKey]
+          b = b[sortKey]
+          return (a === b ? 0 : a > b ? 1 : -1) * order
+        })
+      }
+      return data
+    }
+  },
+  filters: {
+    capitalize: function (str) {
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    }
+  },
+  methods: {
+    sortBy: function (key) {
+      this.sortKey = key
+      this.sortOrders[key] = this.sortOrders[key] * -1
+    },
+   
+    supprimer: function (el,index) {
+        this.data.splice(index,1);
+        console.log('To delete : ',el.nom)
+        app.deleteData(el.nom)
+
+    }
+  }
+})
+
 
 
         Vue.component('panier', {
@@ -890,18 +978,10 @@
                 }
             },
             methods: {
-                ajouter: function () {
-                    this.panier.push(this.input);
-                    this.input = {
-                        article: '',
-                        nom: '',
-                        prix: 0
-                    };
-                },
                 supprimer: function (index) {
                     this.panier.splice(index, 1);
 
-                },
+                }
             },
             filters: {
 
@@ -952,6 +1032,33 @@
 </div>
 
 </script>
+
+
+
+    <script type="text/x-template" id="table-template">
+        <table>
+      <thead>
+        <tr>
+          <th v-for="key in columns"
+            @click="sortBy(key)"
+            :class="{ active: sortKey == key }">
+            {{ key | capitalize }}
+            <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
+            </span>
+          </th>
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="entry in filteredData">
+          <td v-for="key in columns">
+            {{entry[key]}}
+          </td>
+          <td><button class="btn btn-danger btn-block" v-on:click="supprimer(entry,$index)"><i class="fa fa-trash-o fa-lg"></i></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
 
 
 

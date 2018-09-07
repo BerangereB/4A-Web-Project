@@ -160,7 +160,7 @@ router.post('/register.html', function (req, res) {
   }
 })
 
-router.post('/delete.html', function (req, res) {
+router.post('/delete_user.html', function (req, res) {
   var user = req.body
   console.log('********** Tentative de suppresion du compte : ', user)
 
@@ -175,6 +175,7 @@ router.post('/delete.html', function (req, res) {
     res.send('unknown_user')
   }
 })
+
 
 
 router.post('/update_panier.html', function (req, res) {
@@ -327,14 +328,63 @@ router.get('/get_data.html', function (req, res) {
 router.get('/get_attr.html', function (req, res) {
   console.log('********** ATTRIBUTES SENT TO CLIENT *********')
   res.send({
-    dataAttributes: Object.keys((data[0].elements)[0]),
-    categories: ['Photographe', 'Traiteur', 'DJ', 'Decorateur', 'Transports', 'Soins', 'Gateaux'],
+    dataAttributes: ['nom',
+      'text', 'prix',
+      'note',
+      'img',
+      'source',
+      'categorie'
+    ],
+    categories: getCategories(),
     usersAttributes: Object.keys(users[0])
   })
 
-
-
+  console.log(categories)
 })
+
+
+function getCategories(){
+  var categories = []
+  for(let i = 0; i <data.length;i++){
+    if(data[i].elements.length != 0){
+      categories.push(data[i].categorie)
+    }
+  }
+  return categories
+}
+router.post('/delete_data.html', function (req, res) {
+  var name = req.body.name
+  console.log('********** Tentative de suppresion d\'un élément : ', name)
+
+  var el = get_data_by_name(name)
+
+  console.log('element = ', data[el.cat].elements[el.index])
+
+  data[el.cat].elements.splice(el.index,1)
+  console.log('data = ', data)
+
+  res.send('OK')
+})
+
+function get_data_by_name(name) {
+  for (var i = 0; i < data.length; i++) {
+    console.log(data[i])
+    console.log(data[i].elements)
+
+    for (var j = 0; j < data[i].elements.length; j++) {
+      console.log('data(i).elements(j)', data[i].elements[j])
+      console.log('i=', i, 'j=', j)
+      if (data[i].elements[j].nom === name) {
+        return {
+          cat: i,
+          index: j
+        }
+      }
+    }
+  }
+
+
+}
 
 /* DATA */
 var data = [{
