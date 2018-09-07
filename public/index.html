@@ -25,11 +25,11 @@
             <header data-spy="affix" data-offset-top="200">
 
                 <!-------- HEAD NAVIGATION BAR ---------------->
-                <nav id="navbar-header" class="navbar navbar-inverse" role="navigation"  >
+                <nav id="navbar-header" class="navbar navbar-inverse" role="navigation">
 
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a href="#" v-on:click="currentPage = 'home'"><img width="140px" src="/images/logo.png"></a>
+                            <a href="#home" v-on:click="currentPage = 'home'"><img width="140px" src="/images/logo.png"></a>
 
 
                             <button class="navbar-toggle" data-toggle="collapse" data-target="#myNavBarCollapse">
@@ -41,30 +41,20 @@
                         </div>
                         <div class="collapse navbar-collapse" id="myNavBarCollapse">
                             <ul class="nav navbar-nav navbar-right">
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">NOS PARTENAIRES<b class="caret"></b></a>
-                                    <ul class="dropdown-menu">
-                                        <li v-on:click="currentPage = 'partners'"><a href="#">Toutes catégories
-                                                confondues</a></li>
+                                <li v-on:click="currentPage = 'partners'"><a href="#partners">NOS PARTENAIRES</a></li>
+                                <li v-on:click="currentPage = 'forum'"><a href="#forum">FORUM</a></li>
+                                <li v-if='user_connected' v-on:click="currentPage = 'panier'"><a href="#panier">MON
+                                        PANIER</a></li>
 
-                                        <li v-on:click="currentPage = 'partners'"><a href="#photographes">Photographes</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#traiteurs">Traiteurs</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#dj">DJ</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#decorateurs">Décorateurs</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#transports">Modes de
-                                                transport</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#soins">Soins</a></li>
-                                        <li v-on:click="currentPage = 'partners'"><a href="#gateaux">Gâteaux</a></li>
-                                    </ul>
-                                </li>
-                                <li v-on:click="currentPage = 'forum'"><a href="#">FORUM</a></li>
-                                <li v-if='user_connected' v-on:click="currentPage = 'panier'"><a href="#">MON PANIER</a></li>
                                 <li v-if='user_connected && userConnected.isAdmin' class="dropdown">
+
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">ESPACE ADMIN<b class="caret"></b></a>
                                     <ul class="dropdown-menu">
-                                        <li v-on:click="currentPage = 'users_management'"><a href="#">Gestion des
+                                        <li v-on:click="currentPage = 'users_management'"><a href="#users_admin">Gestion
+                                                des
                                                 utilisateurs</a></li>
-                                        <li v-on:click="currentPage = 'data_management'"><a href="#">Gestion des
+                                        <li v-on:click="currentPage = 'data_management'"><a href="#data_admin">Gestion
+                                                des
                                                 données
                                                 services</a></li>
                                     </ul>
@@ -95,16 +85,18 @@
                 <div class="dropdown-content" v-if="!user_connected && buttonClicked" data-spy="affix" data-offset-top="200">
 
                     <div class="row">
-                        <div id="panel" class="col-lg-6 col-xs-12 col-sm-6 col-md-6">
+                        <div id="panel" class="col-lg-12 col-xs-12 col-sm-12 col-md-12">
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-6 text-center">
-                                        <a href="#" v-on:click="login_selected = true; form_errors = []" v-bind:class="{ active: login_selected }">
+                                        <a href="#connection" v-on:click="login_selected = true; form_errors = []"
+                                            v-bind:class="{ active: login_selected }">
                                             Se connecter
                                         </a>
                                     </div>
                                     <div class="col-xs-6 text-center">
-                                        <a href="#" v-on:click="login_selected = false; form_errors = []" v-bind:class="{ active: !login_selected }">
+                                        <a href="#subscribe" v-on:click="login_selected = false; form_errors = []"
+                                            v-bind:class="{ active: !login_selected }">
                                             S'inscrire
                                         </a>
                                     </div>
@@ -128,7 +120,7 @@
 
                                     </div>
                                     <div class="text-center">
-                                        <a href="https://phpoll.com/recover" class="forgot-password">Mot de
+                                        <a href="#" class="forgot-password">Mot de
                                             passe oublié ?</a>
                                     </div>
                                 </form>
@@ -142,14 +134,9 @@
                                     </div>
                                     <input type="text" id="reg_username" placeholder="Nom d'utilisateur" required>
 
-                                    <label class="container" style="width:50%;float:left">Homme
-                                        <input type="radio" checked="checked" name="radio" style="width:25%;float:left">
-                                        <span class="checkmark" style="width:25%;float:left"></span>
-                                    </label>
-                                    <label class="container" style="width:50%;float:left">Femme
-                                        <input type="radio" name="radio" style="width:25%;float:left">
-                                        <span class="checkmark" style="width:25%;float:left"></span>
-                                    </label>
+
+                                    <input type="radio" name="gender" checked>Homme<br>
+                                    <input type="radio" name="gender">Femme<br>
 
                                     <input type="email" id="reg_email" placeholder="Email" required>
                                     <input type="password" id="reg_password" placeholder="Mot de passe" required>
@@ -168,15 +155,19 @@
 
 
                 <!-- FENETRE DE COMPTE affichée suite au clic sur le bouton "mon compte" -->
-                <div class="dropdown-content" v-if="user_connected && buttonClicked" data-spy="affix" data-offset-top="200">
+                <div class="dropdown-content" v-else-if="user_connected && buttonClicked" data-spy="affix"
+                    data-offset-top="200">
 
                     <div id="panel" class="panel">
-                        <p> {{ userConnected.username}}</p>
+                        <p><b>Nom d'utilisateur : {{ userConnected.username }} ( {{ userConnected.gender }} )</b></p>
+                        <p><b>Email : {{ userConnected.email }}</b></p>
 
-                        <p class=" clickable-text" v-on:click="currentPage = 'mon-compte'"> Modifier
+                        <p class=" clickable-text" v-on:click="currentPage = 'mon-compte'; buttonClicked = false">
+                            Modifier
                             mes
                             informations personnelles</p>
-                        <p class="clickable-text">Déconnexion</p>
+                        <button class="clickable-text btn btn-danger" style="position:absolute;bottom:5px;right:5px;"
+                            @click="disconnect()">Déconnexion</a>
 
 
 
@@ -210,8 +201,10 @@
                     </div>
 
                     <div class="container">
+
                         <div class="card-columns">
-                            <mycard v-for="element in best_grades" v-bind:el="element">
+                            <mycard v-for="element in best_grades" v-bind:el="element" v-bind:add_to_panier='add_to_panier'
+                                v-bind:user_connected="user_connected">
                             </mycard>
                         </div>
                     </div>
@@ -222,17 +215,49 @@
 
 
 
+
+
                 <!-- PARTENAIRES -->
-                <section id="partners" v-else-if="currentPage === 'partners'">
+                <section id="partners" v-else-if="currentPage === 'partners'" class="container">
 
 
                     <div class="container">
-                        <div class="card-columns" v-for="cat in categories">
-                            <mycard v-for="element in filter(cat)" v-bind:el="element">
-                            </mycard>
+                        <h2 style="text-align:center">NOS PARTENAIRES</h2>
+                        <div class="choix"><a href="#Photographe">Photographes | </a>
+                            <a href="#Traiteur">Traiteurs | </a>
+                            <a href="#DJ"> DJ | </a>
+                            <a href="#Decorateur"> Décorateurs | </a>
+                            <a href="#Transports"> Voitures de location | </a>
+                            <a href="#Soins"> Soins beauté | </a>
+                            <a href="#Gateaux">Gâteaux </a>
+                        </div>
+                        <div style="padding-top:40px;" v-for="cat in categories" :id="cat">
+
+                            <h1 style="border:1px solid black;text-align:center"><b>{{cat}}</b></h1>
+                            <div id="card" class="card">
+                                <scroller v-for="element in filter(cat)" v-bind:el="element" v-bind:add_to_panier='add_to_panier'
+                                    v-bind:user_connected="user_connected">
+                                </scroller>
+                            </div>
+
                         </div>
 
                     </div>
+
+                </section>
+
+
+
+                <section v-else-if="currentPage === 'panier'">
+                    <div class="container">
+
+                        <panier :panier="panier"></panier>
+
+                        <button style="margin:0 auto" class="btn btn-success" @click="save_panier()">Enregistrer les
+                            modification</button>
+                        <p>Si vous n'enregistrez pas ces modifications votre panier sera vide la prochaine fois que
+                            vous vous connecterez!</p>
+
 
                 </section>
 
@@ -240,18 +265,15 @@
                 <!-------------------- ADMIN  ----------------->
                 <section id="data_management" v-else-if="currentPage === 'data_management'">
 
+
+                    <button class="update_button" @click="update('data')">UPDATE</button>
                     <table id="data_table">
                         <tr>
-                            <th>
-                                Catégorie
-                            </th>
-
                             <th width="12px" v-for="attr in dataAttributes">
                                 {{ attr }}
                             </th>
                         </tr>
                         <tr v-for="el in data">
-                            <td> {{ el.categorie }}</td>
                             <td v-for="attr in dataAttributes">{{ el[attr]}}</td>
                         </tr>
                     </table>
@@ -260,9 +282,11 @@
 
                 <section id="users_management" v-else-if="currentPage === 'users_management'">
 
+                    <button class="update_button" @click="update('users')">UPDATE</button>
+
                     <table id="users_table">
                         <tr>
-                            <th width="12px" v-for="attr in usersAttributes">
+                            <th v-for="attr in usersAttributes">
                                 {{ attr }}
                             </th>
                         </tr>
@@ -292,16 +316,48 @@
                         </div>
                     </div>
                 </section>
+
+
+
+                <!----------- CONTACT --------------->
+
+
+                <section id="contact" v-else-if="currentPage === 'contact'">
+                    <h1> Nous contacter</h1>
+                </section>
+
+
+                <!----------- INFOS USER ---------------->
+                <section id="pageinfo" v-else-if="currentPage === 'mon-compte'">
+
+                    <p class="title"><b>Information personnelle</b></p>
+                    <form id="change-infos-form" @submit.prevent="processChanges" method="post" role="form">
+                        <div class="alert alert-danger" role="alert" style="font-size:12px;" v-if="form_errors.length">
+                            <ul>
+                                <li style="font-size:12px;" v-for="error in form_errors">{{ error }}</li>
+                            </ul>
+                        </div>
+                        <input type="text" id="info_username" placeholder="Nom d'utilisateur" required :value="userConnected.username">
+                        <input type="email" id="info_email" placeholder="Email" required :value='userConnected.email'>
+
+
+                        <button @click="hidden_section_pwd = !hidden_section_pwd">
+                            Voulez-vous changer votre mot de passe ?
+                        </button>
+                        <div v-if="!hidden_section_pwd">
+
+                            <input type="password" id="info_password" placeholder="Mot de passe actuel" required>
+                            <input type="password" id="info_new_password" placeholder="Nouveau mot de passe" required>
+                            <input type="password" id="info_conf_password" placeholder="Confirmation du nouveau mot de passe"
+                                required>
+
+                        </div>
+
+                        <input type="submit" class="btn btn-info" value="Appliquer les modifications">
+
+                    </form>
+                </section>
             </div>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -320,9 +376,9 @@
             <div class="navbar navbar-default">
                 <div class="container-fluid text-center">
 
-                    <strong v-on:click="currentPage = 'home'"><a href="#">ACCUEIL</a></strong>
-                    <strong v-on:click="currentPage = 'partners'"><a href="#"></a>PARTENAIRES</a></strong>
-                    <strong v-on:click="currentPage = 'forum'"><a href="#"></a>FORUM</a></strong>
+                    <strong v-on:click="currentPage = 'home'"><a href="#"> ACCUEIL </a></strong> -
+                    <strong v-on:click="currentPage = 'partners'"><a href="#"> PARTENAIRES </a></strong> -
+                    <strong v-on:click="currentPage = 'forum'"><a href="#"> FORUM </a></strong>
 
 
                     <p style="padding: 5px;">Copyright &#169; 2018 My Event Planner. Tous droits réservés.</p>
@@ -332,7 +388,8 @@
                     <!--Google +-->
                     <button type="button" class="btn btn-gplus red-btn"><i class="fa fa-google-plus pr-1"></i></button>
                     <!--Linkedin-->
-                    <button type="button" class="btn btn-li blue-btn"><i class="fa fa-linkedin pr-1"></i></button>
+                    <button type="button" class="btn btn-li blue-btn"><a style="color:white" href="https://www.linkedin.com/in/berangere-bourdoulous-275013147/"
+                            target="_blank"><i class="fa fa-linkedin pr-1"></i></a></button>
                     <!--Email-->
                     <button type="button" class="btn btn-email gray-btn"><a style="color:white" href="mailto:bourdoulous@et.esiea.fr"><i
                                 class="fa fa-envelope pr-1"></i></a></button>
@@ -341,6 +398,33 @@
 
             </div>
         </footer>
+
+
+
+        <div style="position: fixed;top:70px;width:100%" class="alert alert-danger" v-show="service_error">
+            <p>
+                Vous avez déjà ajouté ce service à votre panier
+            </p>
+            <i @click="service_error = false" style="position: absolute;right:5px;top:5px;cursor: pointer;">x
+
+
+            </i>
+        </div>
+
+        <div style="position: fixed;top:70px;width:100%" class="alert alert-info" v-show="user_connected && alert_panier">
+            <p>
+                Il reste des articles dans votre panier.
+            </p>
+            <button class="btn btn-default" @click="currentPage = 'panier'; alert_panier = false">Voir mon panier</button>
+            <i @click="alert_panier = false" style="position: absolute;right:5px;top:5px;cursor: pointer;">x</i>
+        </div>
+
+        <div style="position: fixed;top:70px;width:100%" class="alert alert-success" v-show="user_connected && success_update">
+                <p>
+                    Mise à jour réalisée avec succès.
+                </p>
+                <i @click="success_update = false" style="position: absolute;right:5px;top:5px;cursor: pointer;">x</i>
+            </div>
 
 
 
@@ -359,42 +443,58 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
-    <script>
-        Vue.component('mycard', {
-            props: ['el'],
-            template: `
-            <div class="card" >
-                        <div class="card-body" style="font-size:12px;display:block;">
-                            <img class="card-img-top" style="width:100%;height:auto;" v-bind:src=el.img alt="img">
-                            <div style="padding:5px;"><b class="card-title">{{ el.categorie }} : {{ el.nom }}</b>
-                            <p class="card-text">{{ el.text }} </p>
-                            <p class="card-price"> {{ el.prix }} €</p>
-                            <p class="card-grade"> {{ el.note }} /5</p>
-                            <button class="btn btn-info"><a :href=el.source target="_blank">Visiter leur site</a></button>
-                            <button class="btn btn-danger" value="+"></button></div>
 
-                        </div>
-                    </div>
-                    `
-        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        function disconnect()
+    {
+         app.disconnect()
+            return "";
+    }
+    window.onbeforeunload = disconnect;
+
+
+
+       
+
 
         Vue.prototype.$http = axios
+
 
 
         var app = new Vue({
             el: '#app',
             data: {
 
+                success_update: false,
+                hidden_section_pwd : true,
                 login_selected: true,
                 services_selected: true,
                 header_1_selected: true,
                 buttonClicked: false,
-                user_connected: true,
+                user_connected: false,
+                alert_panier: false,
 
                 userConnected: {
                     isAdmin: true,
                     email: '',
-                    username: ''
+                    gender: '',
+                    username: '',
+                    state: 0
                 },
                 form_errors: [],
 
@@ -404,19 +504,28 @@
                 best_grades: [],
                 dataAttributes: [],
                 usersAttributes: [],
-                categories: []
+                categories: [],
+                panier: [],
+                service_error: false
 
             },
             created() {
+                
 
+                console.log('Init : attributs/colonnes des tableaux')
                 this.init_tabs_columns()
+                
+                this.get_data()
+                console.log('get data', this.data)
                 if (this.user_connected && this.userConnected.isAdmin) {
-                    this.get_data()
+                    console.log('get users')
                     this.get_users()
+
                 }
+                console.log('get best_grades')
                 this.$http.get('/best_grade.html')
                     .then(res => {
-                        console.log(res.data)
+                        console.log('Best_grades : ',res.data)
                         this.best_grades = res.data
 
                     })
@@ -430,27 +539,26 @@
                     var username = document.getElementById("reg_username").value
                     var password = document.getElementById("reg_password").value
                     var conf_password = document.getElementById("reg_conf_password").value
-
-
-                    if (password != conf_password) {
-                        console.log('mots de passe différents')
-                        this.form_errors.push('La confirmation du mot de passe est incorrect')
-
-                    } else {
+                    var gender = document.getElementsByName("gender")[0].checked ? 'M':'F'
+                    
                         this.$http.post('/register.html', {
                                 username: username,
                                 email: email,
-                                password: password
+                                password: password,
+                                conf_password:conf_password,
+                                gender: gender
                             })
                             .then(res => {
                                 console.log(res.data)
-                                if (res.data === 'email') {
+                                if (res.data != 'OK') {
                                     console.log('mail existant')
-                                    this.form_errors.push('Cette adresse mail est déjà utilisée')
-                                } else {
+                                    this.form_errors = res.data
+                                } else { // le user a été ajouté avec succès
                                     this.userConnected.isAdmin = false
                                     this.userConnected.email = email
                                     this.userConnected.username = username
+                                    this.userConnected.gender = gender
+                                    this.userConnected.state = 1
 
                                     this.user_connected = true
 
@@ -464,7 +572,7 @@
                                 console.log('error', err)
 
                             })
-                    }
+                    
 
 
 
@@ -481,43 +589,39 @@
                             password: password
                         })
                         .then(res => {
-                            switch (res.data) {
-                                case 'email_error':
-                                    console.log('Cette adresse mail n\'existe pas')
-                                    this.form_errors.push('Cette adresse mail est introuvable')
-                                    break
-                                case 'password_error':
-                                    console.log('Mauvais mot de passe')
-                                    this.form_errors.push('Le mot de passe entré est incorrect')
-                                    break
-                                default:
-                                    console.log(res.data + ' OK : ' + email + " is connected")
-                                    this.userConnected.email = email
-                                    this.userConnected.username = res.data.username
-                                    this.userConnected.isAdmin = res.data.isAdmin
-                                    this.user_connected = true
-                                    this.buttonClicked = false
 
+                            console.log(res.data)
+                            if(res.data.errors.length > 0){
+                                this.form_errors = res.data.errors
+                            }else{
+                                this.userConnected.email = email
 
-                                    if (this.userConnected.isAdmin) {
-                                        this.get_data()
-                                    }
+                                this.userConnected.username = res.data.username
+                                this.userConnected.isAdmin = res.data.isAdmin
+                                this.userConnected.gender = res.data.gender
+                                this.userConnected.state = 1
+                                this.user_connected = true
+                                this.buttonClicked = false
+                                this.get_panier(0)
+                            
 
+                                console.log(res.data + ' OK : just connected')
 
+                                if (this.userConnected.isAdmin) {
+                                    this.get_data()
+                                    this.get_users()
+                                }
 
-
+                                
                             }
-                        })
-
-
-                        .catch(err => {
+                        }).catch(err => {
                             console.log("error", err)
                         })
                 },
                 get_data() {
                     this.$http.get('/get_data.html')
                         .then(res => {
-                            console.log(res.data)
+                            console.log("data", res.data)
                             this.data = res.data
 
                         })
@@ -527,17 +631,17 @@
                 get_users() {
                     this.$http.post('/users.html')
                         .then(res => {
-                            console.log(res.data)
+                            console.log("users", res.data)
                             this.users = res.data
 
                         })
 
                 },
                 filter(cat) {
+
                     var deb = 0;
                     var fin = 0;
                     var temp = []
-                    console.log(data, cat)
                     while (this.data[deb].categorie != cat) {
                         deb++;
                     }
@@ -549,6 +653,7 @@
                     for (let i = deb; i < fin; i++) {
                         temp.push(this.data[i])
                     }
+                    console.log(temp)
 
                     return temp;
 
@@ -557,17 +662,162 @@
                 init_tabs_columns() {
                     this.$http.get('/get_attr.html')
                         .then(res => {
-                            console.log(res.data)
+
 
                             this.dataAttributes = res.data.dataAttributes
                             this.usersAttributes = res.data.usersAttributes
                             this.categories = res.data.categories
+                            this.categories.push('categorie')
 
                         })
 
 
 
 
+                },
+                update(str) {
+                    if (str === 'data') {
+
+                        this.get_data()
+                    } else {
+                        this.get_users()
+                    }
+
+                },
+                addUser(user) {
+                    this.$http.post('/register.html',
+                        user)
+
+                },
+                deleteUser(user) {
+                    this.$http.post('/delete.html',
+                        user)
+                },
+                disconnect() {
+                    this.$http.get('/disconnect.html', {
+                            params: {
+                                email: this.userConnected.email
+                            }
+                        })
+                        .then((res) => {
+                                if (res.data === 'OK') {
+                                    this.user_connected = false
+                                    this.userConnected = {
+                                        isAdmin: true,
+                                        email: '',
+                                        username: '',
+                                        state: 0
+                                    }
+                                    this.panier = []
+                                    this.buttonClicked = false
+                                    this.currentPage = 'home'
+                                }
+
+                            }
+
+                        )
+                },
+                add_to_panier(element) {
+
+                    var authorized = true;
+                    this.panier.forEach(function (el) {
+
+                        if (el.nom === element.nom) {
+                            authorized = false
+                        }
+                    });
+
+                    if (authorized) {
+                        var temp_el = {
+                            article: element.img,
+                            categorie: element.categorie,
+                            nom: element.nom,
+                            prix: element.prix
+                        }
+                        console.log(temp_el, " added")
+                        this.panier.push(temp_el)
+                    } else {
+                        console.log("error : already exists ", element)
+                        this.service_error = true
+                    }
+
+                },
+                
+                save_panier() {
+                    console.log(this.panier)
+                    this.$http.post('/update_panier.html', {
+                        new_panier: this.panier,
+                        user: this.userConnected.email
+
+                    })
+                },
+                get_panier(value) {
+                    this.$http.get('/get_panier.html', {
+                        params: {
+                            user: this.userConnected.email
+                        }
+                    }).then(res => {
+                        console.log("result panier : ", res.data)
+                        this.panier = res.data
+
+                        if(value == 0){ // on connection
+                            this.panier = res.data
+                            if(res.data.length != 0){
+                                this.alert_panier = true
+                            }
+                        }
+                        return res.data
+                    })
+                },
+                processChanges(){
+                    this.form_errors = []
+
+                    var username = document.getElementById("info_username").value
+                    if(username === this.userConnected.username){
+                        username = ''
+                    }
+                    
+                    var email = document.getElementById("info_email").value
+                    if(email === this.userConnected.email){
+                        email = ''
+                    }
+                    var password = ''
+                    var new_password = ''
+                    var conf_password = ''
+                    
+                    if(!this.hidden_section_pwd){
+                        password = document.getElementById("info_password").value
+                        new_password = document.getElementById("info_new_password").value
+                        conf_password = document.getElementById("info_conf_password").value
+                    }
+                    
+                    this.$http.post('/update_info_user.html', {
+                                user: this.userConnected.email,
+                                username: username,
+                                email: email,
+                                password: password,
+                                new_password:new_password,
+                                conf_password: conf_password,
+                                checkPassword: !this.hidden_section_pwd
+                            })
+                            .then(res => {
+                                console.log(res.data)
+                                if (res.data != 'OK') {
+                                    this.form_errors = res.data
+                                } else {
+                                    this.userConnected.email = email === ''?this.userConnected.email:email
+                                    this.userConnected.username = username === ''?this.userConnected.username:username
+                                    this.success_update = true
+                                    this.currentPage = 'home'
+                                }
+
+                            })
+                            .catch(err => {
+                                console.log('error', err)
+
+                            })
+
+                        
                 }
 
 
@@ -575,7 +825,137 @@
             }
 
         });
+
+
+
+
+        Vue.component('mycard', {
+            props: ['el', 'add_to_panier', 'user_connected'],
+            template: `
+            <div class="card" id="mycard">
+                        <div class="card-body" style="font-size:12px;display:block;">
+                            <img class="card-img-top" style="width:100%;height:auto;" v-bind:src=el.img alt="img">
+                            <div style="padding:5px;"><b class="card-title">{{ el.categorie }} : {{ el.nom }}</b>
+                            <p>{{ el.text }} </p>
+                            <p> {{ el.prix }} €</p>
+                            <p> {{ el.note }} /5</p>
+                            <button class="btn btn-info"><a style="color:white" :href=el.source target="_blank">Visiter leur site</a></button>
+                            <button v-if="user_connected" class="btn btn-danger" @click="add_to_panier(el)">+</button>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    `
+        })
+
+
+        Vue.component('scroller', {
+            props: ['el', 'add_to_panier', 'user_connected'],
+            template: ` <div class="card--container card-body">
+                            <img style="height:auto;width:350px;" v-bind:src=el.img alt="img">
+                            <div style="padding:5px;"><b class="card-title">{{ el.categorie }} : {{ el.nom }}</b>
+                                <p>{{ el.text }} </p>
+                                <p> {{ el.prix }} €</p>
+                                <p> {{ el.note }} /5</p>
+                                <button class="btn btn-info" ><a style="color:white" :href=el.source target="_blank">Visiter leur site</a></button>
+                                <button v-if="user_connected"  class="btn btn-danger" @click="add_to_panier(el)">+</button>
+                                </div>
+
+                        </div>`
+        })
+
+
+
+        Vue.component('panier', {
+            props: ['panier'],
+            template: '#panier-template',
+            data: function () {
+                return {
+                    input: {
+                        article: '',
+                        categorie: '',
+                        nom: '',
+                        prix: 0
+                    }
+                }
+            },
+            computed: {
+                total: function () {
+                    var total = 0;
+                    this.panier.forEach(function (el) {
+                        total += el.prix * 1;
+                    });
+                    return total;
+                }
+            },
+            methods: {
+                ajouter: function () {
+                    this.panier.push(this.input);
+                    this.input = {
+                        article: '',
+                        nom: '',
+                        prix: 0
+                    };
+                },
+                supprimer: function (index) {
+                    this.panier.splice(index, 1);
+
+                },
+            },
+            filters: {
+
+            }
+        });
     </script>
+
+
+
+
+    <!---->
+    <script type="text/x-template" id="panier-template">
+        <div class="panel panel-primary">
+<div class="panel-heading" style=":text-align:center">Panier</div>        
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+     <th class="col-sm-4">Article</th>
+     <th class="col-sm-3">Nom</th>
+     <th class="col-sm-2">Prix/Total</th>
+     <th class="col-sm-1"></th>
+     
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="item in panier">
+      <td><img v-bind:src="item.article" width="150px" height="150px"> </td>
+      <td>{{ item.categorie }} : {{ item.nom }}</td> 
+      <td>{{ item.prix }} €</td>
+
+      <td><button class="btn btn-danger btn-block" v-on:click="supprimer($index)"><i class="fa fa-trash-o fa-lg"></i></button></td>
+    </tr> 
+    <tr>
+      <td colspan="2"></td>
+      <td><strong>{{ total  }} €</strong></td>
+      <td colspan="2"></td>
+    </tr> 
+          <!--        
+    <tr>
+      <td><input type="text" class="form-control" v-model="input.article | capitalize" v-el:modif placeholder="Article"></td>
+      <td><input type="text" class="form-control" placeholder="Nom">{{ input.nom | capitalize }}</td>
+      <td><input type="text" class="form-control" v-model="input.prix " placeholder="Prix"></td>
+      <td colspan="3"><button class="btn btn-primary btn-block" v-on:click="ajouter()">Ajouter</button></td>
+    </tr>-->
+                  
+  </tbody>       
+</table>
+</div>
+
+</script>
+
+
+
+
 
 
 

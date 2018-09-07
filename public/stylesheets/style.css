@@ -3,33 +3,36 @@ html, body, #content {
   margin: 0;
   padding: 0;
   position: relative;
+  font-family: Courier, monospace
 }
 
 #content {
   background-color: #f5f5f5;
-  
+  padding-bottom: 60px;
 }
 
-
-
-
 .affix {
-  top:0;
+  top: 0;
   width: 100%;
   z-index: 9999 !important;
 }
+
 .navbar {
   margin-bottom: 0px;
 }
-.affix ~ .container-fluid {
- position: relative;
- top: 50px;
+
+.affix~.container-fluid {
+  position: relative;
+  top: 50px;
 }
 
-.dropdown-content{
+.dropdown-content {
   position: absolute;
-  right:0;
-  width:40%;
+  right: 0;
+  width: 40%;
+  background-color: white;
+  border-radius: 2px;
+  box-shadow: 0px 3px 4px 0px lightgray;
 }
 
 .background-header {
@@ -64,6 +67,13 @@ html, body, #content {
   color: white;
 }
 
+
+img:hover {
+	opacity: 0.5;
+	filter: alp /32016+ha(opacity=50);
+
+}
+
 @media (min-width:0) {
   .container {
     padding-right: 20px;
@@ -75,7 +85,7 @@ html, body, #content {
   .card-columns {
     column-count: 2;
   }
-  .iner {
+  .container {
     padding-right: 20px;
     padding-left: 20px;
   }
@@ -93,7 +103,7 @@ html, body, #content {
   }
 }
 
-.card {
+#mycard {
   background-color: white;
   border-radius: 2px;
   box-shadow: 0px 3px 4px 0px lightgray;
@@ -103,8 +113,6 @@ html, body, #content {
   display: inline-block;
   width: 100%;
 }
-
-
 
 .panel-body input {
   width: 100%;
@@ -118,11 +126,10 @@ html, body, #content {
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
-  width:100%;
+  width: 100%;
 }
 
-
-@media (max-width: 992px) {
+@media (max-width: 810px) {
   .navbar {
     overflow-y: auto;
   }
@@ -202,12 +209,14 @@ html, body, #content {
 /******* TABLEAUX ********/
 
 #data_table, #users_table {
+  margin-top: 20px;
   width: 100%;
+  background: white;
 }
 
 #data_table, td, th {
-  text-align: center;
-  padding: 5px;
+  text-align: left;
+  padding: 2px;
   border: 1px solid rgb(114, 114, 114);
 }
 
@@ -224,5 +233,61 @@ th {
 
 .panel-heading a.active {
   color: rgb(202, 108, 108);
+  font-weight: bold;
   font-size: 14px;
 }
+
+#card .card--container {
+  display: inline-block;
+  width: 350px;
+  margin-right: 10px;
+  background-color: white;
+  border-radius: 2px;
+  box-shadow: 0px 3px 4px 0px lightgray;
+  padding: 0;
+}
+
+#card {
+  display: flex;
+  margin-bottom: 20px;
+  border: 1px solid rgb(206, 206, 206);
+  min-width: 100%;
+  max-height: auto;
+  overflow-x: auto;
+  background: transparent;
+  box-shadow: none;
+}
+
+#card::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #F5F5F5;
+}
+
+#card::-webkit-scrollbar {
+  width: 12px;
+  background-color: #F5F5F5;
+}
+
+#card::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: rgb(233, 123, 123);
+}
+
+
+#panel{
+  padding:5px;
+  text-align: center;
+}
+
+#panel p{
+  margin-bottom:15px;
+}
+
+.clickable-text{
+  cursor: pointer;
+}
+
+.clickable-text:hover{
+  color: deepskyblue;
+}
+
